@@ -1,0 +1,17 @@
+CREATE TABLE employees 
+(code INTEGER CONSTRAINT emp_employee_id PRIMARY KEY
+, name VARCHAR(24) CONSTRAINT emp_name_nn NOT NULL
+, last_name VARCHAR(32) CONSTRAINT emp_ln_nn NOT NULL
+, login VARCHAR(16) CONSTRAINT emp_log_nn NOT NULL
+, psw VARCHAR(16) );
+
+
+
+CREATE TABLE EmployeeHistory
+(id INTEGER CONSTRAINT eh_empl_id PRIMARY KEY
+, position VARCHAR(24) CONSTRAINT eh_pos_nn NOT NULL
+, manager INTEGER CONSTRAINT emp_man_ck CHECK (manager>0)
+, hire DATE CONSTRAINT eh_hire_nn NOT NULL
+, dismiss DATE
+, code INTEGER CONSTRAINT eh_code_fk REFERENCES employees (code)
+, CONSTRAINT eh_dismiss_ck CHECK (dismiss >= hire) );
