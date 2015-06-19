@@ -6,14 +6,15 @@
 package course;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
  * @author samsung
  */
 public interface History {
-   String[] getHistory (String surname) throws SQLException;
-   String[] getHistory (int code) throws SQLException;
+   ArrayList<String> getHistory (String surname) throws SQLException;
+   ArrayList<String> getHistory (int code) throws SQLException;
    boolean login (String user, String password) throws SQLException;
    boolean logout ();
 }

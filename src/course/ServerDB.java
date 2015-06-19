@@ -6,6 +6,7 @@
 package course;
 
 import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -18,6 +19,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.rmi.Remote;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -48,11 +50,11 @@ public class ServerDB extends UnicastRemoteObject implements RemoteIF, History {
     public static String result;
 
     public static void main(String[] args) throws SQLException, RemoteException, InterruptedException, AlreadyBoundException, Exception {
-        //StartRMIServ();
         Instance().connectDB();
         //dropAllTables();
         //createTablesCompanyDB();
         //closeConnectionDB();
+        Instance().StartRMIServ();
       /*
          String [] s = Instance().getHistory("Malevich");
          System.out.println("getHistroy using String parameter");
@@ -61,6 +63,7 @@ public class ServerDB extends UnicastRemoteObject implements RemoteIF, History {
          }
          */
 
+        /*
         int cde = 1;
         String[] cd = Instance().getHistory(cde);
         System.out.println("getHistroy using int parameter");
@@ -71,6 +74,7 @@ public class ServerDB extends UnicastRemoteObject implements RemoteIF, History {
         boolean check = Instance().login("kmalev", "4321");
         System.out.println("/n login method /n");
         System.out.println("" + check);
+        */
 
     }
 
@@ -203,16 +207,20 @@ public class ServerDB extends UnicastRemoteObject implements RemoteIF, History {
     
      }
      */
-    public static void StartRMIServ() throws RemoteException, InterruptedException, AlreadyBoundException {
+    public void StartRMIServ() throws RemoteException, InterruptedException, AlreadyBoundException, Exception {
         try {
+            System.out.println("StartRMIServ(): BEGIN");
+            /*
             System.out.print("Registry...");
             final Registry registry = LocateRegistry.createRegistry(2222);
             System.out.println("OK");
+            */
             ServerDB service = ServerDB.Instance();
             //Remote stub = UnicastRemoteObject.exportObject(service, 0);
-            System.out.println("Binding...");
-            registry.rebind(BINDING_NAME, service);
-            System.out.println("OK");
+            //System.out.println("Binding...");
+            Naming.rebind(BINDING_NAME, service);
+            //registry.rebind(BINDING_NAME, service);
+            System.out.println("StartRMIServ(): OK");
         } catch (Exception ex) {
             // XXX
             throw ex;
@@ -234,42 +242,37 @@ public class ServerDB extends UnicastRemoteObject implements RemoteIF, History {
 
     }
 
-    @Override
-    public String[] getHistory(String surname) throws SQLException {
-        String qHistory = "SELECT e.name, e.last_name, eh.manager, eh.position, eh.hire, eh.dismiss FROM employees e JOIN employeehistory eh ON e.code = eh.code WHERE e.last_name =" + "'" + surname + "'";
-        String[] resArray = new String[10];
+    // TODO: use prepared statement instead of query string
+    private ArrayList<String> executeQuery(String q) throws SQLException
+    {
         Statement stmt = connectionDB.createStatement();
-        ResultSet rslt = stmt.executeQuery(qHistory);
+        ResultSet rslt = stmt.executeQuery(q);
         ResultSetMetaData rsmd = rslt.getMetaData();
         int numberOfColumns = rsmd.getColumnCount();
+        ArrayList<String> resArray = new ArrayList<String>();
         while (rslt.next()) {
+            String row = new String();
             for (int i = 1; i <= numberOfColumns; i++) {
                 if (i > 1) {
-                    System.out.print(" ");
+                    row += " ";
                 }
-                resArray[i] = rslt.getString(i);
+                row += rslt.getString(i);
             }
+            resArray.add(row);
         }
         return resArray;
     }
+    
+    @Override
+    public ArrayList<String> getHistory(String surname) throws SQLException {
+        final String qHistory = "SELECT e.name, e.last_name, eh.manager, eh.position, eh.hire, eh.dismiss FROM employees e JOIN employeehistory eh ON e.code = eh.code WHERE e.last_name =" + "'" + surname + "'";
+        return executeQuery(qHistory);
+    }
 
     @Override
-    public String[] getHistory(int code) throws SQLException {
-        String qHistoryCode = "SELECT e.name, e.last_name, eh.manager, eh.position, eh.hire, eh.dismiss FROM employees e JOIN employeehistory eh ON e.code = eh.code WHERE e.code =" + code;
-        Statement stmt = connectionDB.createStatement();
-        ResultSet rslt = stmt.executeQuery(qHistoryCode);
-        String[] resArray = new String[10];
-        ResultSetMetaData rsmd = rslt.getMetaData();
-        int numberOfColumns = rsmd.getColumnCount();
-        while (rslt.next()) {
-            for (int i = 1; i <= numberOfColumns; i++) {
-                if (i > 1) {
-                    System.out.print(" ");
-                }
-                resArray[i] = rslt.getString(i);
-            }
-        }
-        return resArray;
+    public ArrayList<String> getHistory(int code) throws SQLException {
+        final String qHistoryCode = "SELECT e.name, e.last_name, eh.manager, eh.position, eh.hire, eh.dismiss FROM employees e JOIN employeehistory eh ON e.code = eh.code WHERE e.code =" + code;
+        return executeQuery(qHistoryCode);
     }
 
     @Override
@@ -285,7 +288,7 @@ public class ServerDB extends UnicastRemoteObject implements RemoteIF, History {
 
     @Override
     public boolean logout() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return true;
     }
 
 }
