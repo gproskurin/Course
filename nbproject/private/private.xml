@@ -3,13 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/samsung/Desktop/Course/src/course/ServerTCP.java</file>
-            <file>file:/C:/Users/samsung/Desktop/Course/src/course/History.java</file>
-            <file>file:/C:/Users/samsung/Desktop/Course/src/course/ServerDB.java</file>
-            <file>file:/C:/Users/samsung/Desktop/Course/src/course/ClientTCP.java</file>
-            <file>file:/C:/Users/samsung/Desktop/Course/src/course/ClassRMI.java</file>
-            <file>file:/C:/Users/samsung/Desktop/Course/src/course/Data.java</file>
-            <file>file:/C:/Users/samsung/Desktop/Course/src/course/RemoteIF.java</file>
+            <file>file:/home/gpr/src/Course/src/course/ClassRMI.java</file>
+            <file>file:/home/gpr/src/Course/src/course/RemoteIF.java</file>
+            <file>file:/home/gpr/src/Course/src/course/ServerDB.java</file>
+            <file>file:/home/gpr/src/Course/src/course/ClientTCP.java</file>
+            <file>file:/home/gpr/src/Course/src/course/ServerTCP.java</file>
+            <file>file:/home/gpr/src/Course/src/course/History.java</file>
         </group>
     </open-files>
 </project-private>
