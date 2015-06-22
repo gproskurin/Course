@@ -1,24 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package course;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-/**
- *
- * @author samsung
- */
 public class ClientTCP implements History {
 
     private final static int DEFAULT_SERVER_PORT = 8888;
@@ -34,8 +21,8 @@ public class ClientTCP implements History {
     @Override
     public ArrayList<String> getHistory(String code) {
         try {
-            ArrayList<String> req = new ArrayList<String>();
-            req.add("getHistoryString");
+            ArrayList<String> req = new ArrayList<>();
+            req.add("getHistoryByName");
             req.add(code);
             ArrayList<String> resp = sendRequestGetResponse(req);
             return resp;
@@ -47,13 +34,22 @@ public class ClientTCP implements History {
 
     @Override
     public ArrayList<String> getHistory(int code) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            ArrayList<String> req = new ArrayList<>();
+            req.add("getHistoryByCode");
+            req.add(Integer.toString(code));
+            ArrayList<String> resp = sendRequestGetResponse(req);
+            return resp;
+        } catch (Exception ex) {
+            System.out.println("Exception in getHistory(int): " + ex);
+            return null;
+        }
     }
 
     @Override
     public boolean login(String user, String password) {
         try {
-            ArrayList<String> req = new ArrayList<String>();
+            ArrayList<String> req = new ArrayList<>();
             req.add("login");
             req.add(user);
             req.add(password);
@@ -70,7 +66,7 @@ public class ClientTCP implements History {
     @Override
     public boolean logout() {
         try {
-            ArrayList<String> req = new ArrayList<String>();
+            ArrayList<String> req = new ArrayList<>();
             req.add("logout");
             ArrayList<String> resp = sendRequestGetResponse(req);
             boolean result = (resp.get(0) == "ok");
@@ -99,16 +95,17 @@ public class ClientTCP implements History {
         outStream = new ObjectOutputStream(clSocket.getOutputStream());
         inStream = new ObjectInputStream(clSocket.getInputStream());
 
-        boolean l1 = login("user1", "passwd1");
-        boolean l2 = login("user1", "passwd_11");
-        ArrayList<String> s = getHistory("user3");
+        boolean l11 = login("vp", "passw1");
+        boolean l12 = logout();
+
+        boolean l21 = login("user1", "passwd_11");
+        
+        boolean l31 = login("pv", "incorrect_passw2");
+        boolean l32 = login("pv", "passw2");
+        
+        ArrayList<String> s1 = getHistory(123);
+        ArrayList<String> s2 = getHistory(124);
+        ArrayList<String> s3 = getHistory(125);
     }
 
-    /*
-     public static void ShutdownClient() throws IOException {
-     clSocket.shutdownInput();
-     clSocket.shutdownOutput();
-     clSocket.close();
-     }
-     */
 }

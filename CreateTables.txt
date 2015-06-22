@@ -15,3 +15,12 @@ CREATE TABLE EmployeeHistory
 , dismiss DATE
 , code INTEGER CONSTRAINT eh_code_fk REFERENCES employees (code)
 , CONSTRAINT eh_dismiss_ck CHECK (dismiss >= hire) );
+
+insert into employees (code, name, last_name, login, psw) values (123, 'Vasya', 'pupkin', 'vp', 'passw1');
+insert into employees (code, name, last_name, login, psw) values (124, 'Kazimir', 'Malevich', 'km', 'pkm');
+insert into employees (code, name, last_name, login, psw) values (125, 'Karl', 'Marks', 'karl', 'kmpassw');
+
+insert into employeehistory (id, code, position, manager, hire, dismiss) values (1, 123, 'boss', 111, '2011-12-31', '2012-01-01');
+insert into employeehistory (id, code, position, manager, hire, dismiss) values (2, 124, 'painter', 111, '2010-01-31', '2012-01-31');
+insert into employeehistory (id, code, position, manager, hire, dismiss) values (3, 125, 'capitalist', 111, '2010-10-31', '2012-10-31');
+insert into employeehistory (id, code, position, manager, hire, dismiss) values (4, 125, 'democrat', 111, '2013-10-31', '2014-10-31');

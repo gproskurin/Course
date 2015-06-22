@@ -1,38 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package course;
 
-import java.io.Serializable;
-import java.rmi.RemoteException;
+import java.rmi.Remote;
 
-/**
- *
- * @author samsung
- */
-public class ClassRMI implements RemoteIF, Serializable {
-  
-    public static final String BINDING_NAME = "CompanyDBService";
-
-    public ClassRMI() throws RemoteException {
-        super();
-
-    }
-    
-    
-    @Override
-    public void CheckConnection() throws RemoteException {
-        String response = "Hello from server";
-       
-    }
-/*
-    @Override
-    public String UserInfo() throws RemoteException {
-      String data;
-      
-      return data;
-    }
- */
+// ClassRMI is an interface for communication with RMI server (used by TCP server)
+public interface ClassRMI extends
+        RemoteIF, // system-specific part (checking DB connection)
+        History, // application-specific part (getHistory(), ...)
+        Remote // required for RMI
+{
 }
