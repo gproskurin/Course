@@ -104,12 +104,22 @@ public class ServerTCP {
                             }
                             break;
                         case "getHistoryByName":
-                            String name = request.get(1);
-                            response.addAll(rmiDbServer.getHistory(name));
+                            if (logged_in) {
+                                String name = request.get(1);
+                                response.add("ok");
+                                response.addAll(rmiDbServer.getHistory(name));
+                            } else {
+                                response.add("not_logged_in");
+                            }
                             break;
                         case "getHistoryByCode":
-                            int code = Integer.parseInt(request.get(1));
-                            response.addAll(rmiDbServer.getHistory(code));
+                            if (logged_in) {
+                                int code = Integer.parseInt(request.get(1));
+                                response.add("ok");
+                                response.addAll(rmiDbServer.getHistory(code));
+                            } else {
+                                response.add("not_logged_in");
+                            }
                             break;
                         default:
                             response.add("unrecognized_command");

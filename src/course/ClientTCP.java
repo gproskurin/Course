@@ -18,6 +18,18 @@ public class ClientTCP implements History {
         ct.StartClientTCP();
     }
 
+    // check array a
+    // if it is not empty and first string is "ok", remove first "ok" string and return the rest. This indicates success
+    // otherwise, return null. This indicates failure
+    private static ArrayList<String> checkFirstOk(ArrayList<String> a)
+    {
+        if (a.isEmpty() || !a.get(0).equals("ok"))
+            return null; // failure
+        // success, remove first "ok" string, return the rest
+        a.remove(0);
+        return a;
+    }
+
     @Override
     public ArrayList<String> getHistory(String name) {
         try {
@@ -25,7 +37,7 @@ public class ClientTCP implements History {
             req.add("getHistoryByName");
             req.add(name);
             ArrayList<String> resp = sendRequestGetResponse(req);
-            return resp;
+            return checkFirstOk(resp);
         } catch (Exception ex) {
             System.out.println("Exception in getHistoryString(): " + ex);
             return null;
@@ -39,7 +51,7 @@ public class ClientTCP implements History {
             req.add("getHistoryByCode");
             req.add(Integer.toString(code));
             ArrayList<String> resp = sendRequestGetResponse(req);
-            return resp;
+            return checkFirstOk(resp);
         } catch (Exception ex) {
             System.out.println("Exception in getHistory(int): " + ex);
             return null;
@@ -54,7 +66,7 @@ public class ClientTCP implements History {
             req.add(user);
             req.add(password);
             ArrayList<String> resp = sendRequestGetResponse(req);
-            boolean result = (resp.get(0) == "ok"); // "ok" in first element indicates success
+            boolean result = (checkFirstOk(resp) != null);
             return result;
         } catch (Exception ex) {
             // In case of error, just return false
@@ -69,7 +81,7 @@ public class ClientTCP implements History {
             ArrayList<String> req = new ArrayList<>();
             req.add("logout");
             ArrayList<String> resp = sendRequestGetResponse(req);
-            boolean result = (resp.get(0) == "ok"); // "ok" in first element indicates success
+            boolean result = (checkFirstOk(resp) != null);
             return result;
         } catch (Exception ex) {
             // In case of error, just return false
@@ -100,7 +112,7 @@ public class ClientTCP implements History {
         System.out.println("*** Login 2.1: " + login("user1", "passwd_11"));
         
         System.out.println("*** Login 3.1: " + login("pv", "incorrect_passw2"));
-        System.out.println("*** Login 3.2: " + login("pv", "passw2"));
+        System.out.println("*** Login 3.2: " + login("vp", "passw1"));
         
         System.out.println("*** History 1: " + getHistory(123));
         System.out.println("*** History 2: " + getHistory(124));
