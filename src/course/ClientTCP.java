@@ -19,11 +19,11 @@ public class ClientTCP implements History {
     }
 
     @Override
-    public ArrayList<String> getHistory(String code) {
+    public ArrayList<String> getHistory(String name) {
         try {
             ArrayList<String> req = new ArrayList<>();
             req.add("getHistoryByName");
-            req.add(code);
+            req.add(name);
             ArrayList<String> resp = sendRequestGetResponse(req);
             return resp;
         } catch (Exception ex) {
@@ -54,7 +54,7 @@ public class ClientTCP implements History {
             req.add(user);
             req.add(password);
             ArrayList<String> resp = sendRequestGetResponse(req);
-            boolean result = (resp.get(0) == "ok");
+            boolean result = (resp.get(0) == "ok"); // "ok" in first element indicates success
             return result;
         } catch (Exception ex) {
             // In case of error, just return false
@@ -69,7 +69,7 @@ public class ClientTCP implements History {
             ArrayList<String> req = new ArrayList<>();
             req.add("logout");
             ArrayList<String> resp = sendRequestGetResponse(req);
-            boolean result = (resp.get(0) == "ok");
+            boolean result = (resp.get(0) == "ok"); // "ok" in first element indicates success
             return result;
         } catch (Exception ex) {
             // In case of error, just return false
@@ -89,23 +89,23 @@ public class ClientTCP implements History {
 
         System.out.println("TCP Client side");
 
-        // Создать экземпляр класса Socket;
         clSocket = new Socket("localhost", DEFAULT_SERVER_PORT);
 
         outStream = new ObjectOutputStream(clSocket.getOutputStream());
         inStream = new ObjectInputStream(clSocket.getInputStream());
 
-        boolean l11 = login("vp", "passw1");
-        boolean l12 = logout();
+        System.out.println("*** Login 1.1: " + login("vp", "passw1"));
+        System.out.println("*** Login 1.2: " + logout());
 
-        boolean l21 = login("user1", "passwd_11");
+        System.out.println("*** Login 2.1: " + login("user1", "passwd_11"));
         
-        boolean l31 = login("pv", "incorrect_passw2");
-        boolean l32 = login("pv", "passw2");
+        System.out.println("*** Login 3.1: " + login("pv", "incorrect_passw2"));
+        System.out.println("*** Login 3.2: " + login("pv", "passw2"));
         
-        ArrayList<String> s1 = getHistory(123);
-        ArrayList<String> s2 = getHistory(124);
-        ArrayList<String> s3 = getHistory(125);
+        System.out.println("*** History 1: " + getHistory(123));
+        System.out.println("*** History 2: " + getHistory(124));
+        System.out.println("*** History 3: " + getHistory(125));
+        System.out.println("*** History 4: " + getHistory("Marks")); // all Markses
     }
 
 }

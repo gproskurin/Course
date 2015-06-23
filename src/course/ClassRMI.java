@@ -6,6 +6,7 @@ import java.rmi.Remote;
 public interface ClassRMI extends
         RemoteIF, // system-specific part (checking DB connection)
         History, // application-specific part (getHistory(), ...)
+        
         Remote // required for RMI
 {
 }

@@ -21,11 +21,13 @@ public class ServerDB extends UnicastRemoteObject implements ClassRMI {
     private static ServerDB server = null;
     private Connection connectionDB = null;
     
+    // this class is created by Instance() function, so constructor is private
     private ServerDB() throws RemoteException {
     }
 
     // singleton pattern
-    public static synchronized ServerDB Instance() throws RemoteException {
+    public static ServerDB Instance() throws RemoteException {
+        // first call to this function creates object
         if (server == null) {
             server = new ServerDB();
         }
@@ -55,6 +57,83 @@ public class ServerDB extends UnicastRemoteObject implements ClassRMI {
         System.out.println("Connection to CompanyDB closed");
     }
 
+    private void StartRMIServ() throws RemoteException, InterruptedException, AlreadyBoundException, Exception {
+        ServerDB service = ServerDB.Instance();
+        Naming.rebind(BINDING_NAME, service);
+        System.out.println("StartRMIServ(): OK");
+    }
+
+    // Override function from RemoteIF
+    @Override
+    public void CheckConnection() throws RemoteException {
+        System.out.println("rmi ok");
+    }
+
+    // Execute SQL query passed by argument, return array (ArrayList) of rows. Each row is concatenation of all its columns, separated by space
+    // TODO (optimization): prepare statements once at start instead of preparing them for each query
+    private ArrayList<String> executeQuery(String q) {
+        try {
+            Statement stmt = connectionDB.createStatement();
+            ResultSet rslt = stmt.executeQuery(q);
+            ResultSetMetaData rsmd = rslt.getMetaData();
+            final int numberOfColumns = rsmd.getColumnCount();
+            ArrayList<String> resArray = new ArrayList<>();
+            while (rslt.next()) { // for each row of result
+                String row = new String();
+                
+                //concatenate all columns, separate them by space
+                for (int i = 1; i <= numberOfColumns; i++) {
+                    if (i > 1) {
+                        row += " ";
+                    }
+                    row += rslt.getString(i);
+                }
+                
+                resArray.add(row);
+            }
+            return resArray;
+        } catch (Exception ex) {
+            System.out.println("Exception in executeQuery: " + ex);
+            return null;
+        }
+    }
+
+    @Override
+    public ArrayList<String> getHistory(String surname) throws RemoteException {
+        System.out.println("ServerDB: getHistory(String '"+surname+"')");
+        final String qHistory = "SELECT e.name, e.last_name, eh.manager, eh.position, eh.hire, eh.dismiss FROM employees e JOIN employeehistory eh ON e.code = eh.code WHERE e.last_name =" + "'" + surname + "'";
+        return executeQuery(qHistory);
+    }
+
+    @Override
+    public ArrayList<String> getHistory(int code) throws RemoteException {
+        System.out.println("ServerDB: getHistory(int "+code+")");
+        final String qHistoryCode = "SELECT e.name, e.last_name, eh.manager, eh.position, eh.hire, eh.dismiss FROM employees e JOIN employeehistory eh ON e.code = eh.code WHERE e.code =" + code;
+        return executeQuery(qHistoryCode);
+    }
+
+    @Override
+    public boolean login(String user, String password) throws RemoteException {
+        System.out.println("ServerDB: login('"+user+"','"+password+"')");
+        try {
+            String qLogin = "SELECT 1 FROM employees WHERE login = '" + user + "' AND psw = '" + password + "'";
+            Statement stmt = connectionDB.createStatement();
+            ResultSet rslt = stmt.executeQuery(qLogin);
+            return (rslt.next()); // non-empty result of query means success
+        } catch (Exception ex) {
+            System.out.println("Exception in login(): " + ex);
+            return false; // if some error occurs, return false
+        }
+    }
+
+    @Override
+    public boolean logout() throws RemoteException {
+        System.out.println("ServerDB: logout");
+        return true;
+    }
+    
+    // unused
+    /*
     private void createTablesCompanyDB() throws SQLException {
         String employeesTable = " CREATE TABLE employees "
                 + " (code INTEGER CONSTRAINT emp_employee_id PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)"
@@ -92,7 +171,10 @@ public class ServerDB extends UnicastRemoteObject implements ClassRMI {
 
         stmt.close();
     }
+    */
 
+    // unused
+    /*
     private boolean checkIfTableExists(final String tn) throws SQLException {
         DatabaseMetaData dmd;
         try {
@@ -106,7 +188,10 @@ public class ServerDB extends UnicastRemoteObject implements ClassRMI {
         rs.close();
         return res;
     }
+    */
 
+    // unused
+    /*
     private void dropAllTables() throws SQLException {
         String dropEmp = "DROP TABLE EMPLOYEES";
         String dropEmpHist = "DROP TABLE EMPLOYEEHISTORY";
@@ -119,74 +204,5 @@ public class ServerDB extends UnicastRemoteObject implements ClassRMI {
         }
         stmt.close();
     }
-
-    private void StartRMIServ() throws RemoteException, InterruptedException, AlreadyBoundException, Exception {
-        ServerDB service = ServerDB.Instance();
-        Naming.rebind(BINDING_NAME, service);
-        System.out.println("StartRMIServ(): OK");
-    }
-
-    @Override
-    public void CheckConnection() throws RemoteException {
-        System.out.println("rmi ok");
-    }
-
-    // TODO: prepare statements once at start instead of preparing them for each query
-    private ArrayList<String> executeQuery(String q) {
-        try {
-            Statement stmt = connectionDB.createStatement();
-            ResultSet rslt = stmt.executeQuery(q);
-            ResultSetMetaData rsmd = rslt.getMetaData();
-            final int numberOfColumns = rsmd.getColumnCount();
-            ArrayList<String> resArray = new ArrayList<>();
-            while (rslt.next()) {
-                String row = new String();
-                for (int i = 1; i <= numberOfColumns; i++) {
-                    if (i > 1) {
-                        row += " ";
-                    }
-                    row += rslt.getString(i);
-                }
-                resArray.add(row);
-            }
-            return resArray;
-        } catch (Exception ex) {
-            System.out.println("Exception in executeQuery: " + ex);
-            return null;
-        }
-    }
-
-    @Override
-    public ArrayList<String> getHistory(String surname) throws RemoteException {
-        System.out.println("ServerDB: getHistory(String)");
-        final String qHistory = "SELECT e.name, e.last_name, eh.manager, eh.position, eh.hire, eh.dismiss FROM employees e JOIN employeehistory eh ON e.code = eh.code WHERE e.last_name =" + "'" + surname + "'";
-        return executeQuery(qHistory);
-    }
-
-    @Override
-    public ArrayList<String> getHistory(int code) throws RemoteException {
-        System.out.println("ServerDB: getHistory(int)");
-        final String qHistoryCode = "SELECT e.name, e.last_name, eh.manager, eh.position, eh.hire, eh.dismiss FROM employees e JOIN employeehistory eh ON e.code = eh.code WHERE e.code =" + code;
-        return executeQuery(qHistoryCode);
-    }
-
-    @Override
-    public boolean login(String user, String password) throws RemoteException {
-        System.out.println("");
-        try {
-            String qLogin = "SELECT 1 FROM employees WHERE login = '" + user + "' AND psw = '" + password + "'";
-            Statement stmt = connectionDB.createStatement();
-            ResultSet rslt = stmt.executeQuery(qLogin);
-            return (rslt.next()); // non-empty result of query means success
-        } catch (Exception ex) {
-            System.out.println("Exception in login(): " + ex);
-            return false; // if some error occurs, return false
-        }
-    }
-
-    @Override
-    public boolean logout() throws RemoteException {
-        return true;
-    }
-
+    */
 }
