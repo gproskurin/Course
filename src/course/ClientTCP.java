@@ -110,10 +110,10 @@ public class ClientTCP implements History {
         System.out.println("*** Login 1.2: " + logout());
 
         System.out.println("*** Login 2.1: " + login("user1", "passwd_11"));
-        
+
         System.out.println("*** Login 3.1: " + login("pv", "incorrect_passw2"));
         System.out.println("*** Login 3.2: " + login("vp", "passw1"));
-        
+
         System.out.println("*** History 1: " + getHistory(123));
         System.out.println("*** History 2: " + getHistory(124));
         System.out.println("*** History 3: " + getHistory(125));
